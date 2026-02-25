@@ -52,53 +52,65 @@ from database.db import get_phone_by_name
 
 phone = get_phone_by_name("S23 Ultra")
 
-print(phone)
+# print(phone)
 
 from database.db import get_phone_by_name
 from rag.formatter import format_specs
 
-phone = get_phone_by_name("S23 Ultra")
-answer = format_specs(phone)
-print(phone)
-print(answer)
+# phone = get_phone_by_name("S23 Ultra")
+# answer = format_specs(phone)
+# print(phone)
+# print(answer)
 
 from core.query_classifier import classify_query
 
-q1 = "What are the specs of Samsung Galaxy S23 Ultra?"
-q2 = "Compare Galaxy S23 Ultra and S22 Ultra"
-q3 = "Which Samsung phone has the best battery?"
+# q1 = "What are the specs of Samsung Galaxy S23 Ultra?"
+# q2 = "Compare Galaxy S23 Ultra and S22 Ultra"
+# q3 = "Which Samsung phone has the best battery?"
 
-print(classify_query(q1))
-print(classify_query(q2))
-print(classify_query(q3))
+# print(classify_query(q1))
+# print(classify_query(q2))
+# print(classify_query(q3))
 
 from agents.data_extractor import extract_models_from_query, get_phone_data_for_models
 
-question = "Compare Galaxy S23 Ultra and S22 Ultra"
+# question = "Compare Galaxy S23 Ultra and S22 Ultra"
 
-models = extract_models_from_query(question)
-print("Detected models:", models)
+# models = extract_models_from_query(question)
+# print("Detected models:", models)
 
-phones = get_phone_data_for_models(models)
-print("Phone data:", phones)
+# phones = get_phone_data_for_models(models)
+# print("Phone data:", phones)
 
 from agents.data_extractor import extract_models_from_query, get_phone_data_for_models
 from agents.review_generator import generate_comparison
 
 question = "Compare Galaxy S23 Ultra and S21 Ultra for photography"
-print("Question:", classify_query(question))
-if classify_query(question) == "compare":
-    print("This is a comparison query.")
-    models = extract_models_from_query(question)
-    phones = get_phone_data_for_models(models)
-    answer = generate_comparison(phones, question)
-    print(answer)
-elif classify_query(question) == "specs":
-    print("This is a specs query.")
-    models = extract_models_from_query(question)
-    phones = get_phone_data_for_models(models)
-    for phone in phones:
-        print(format_specs(phone))
+# print("Question:", classify_query(question))
+query_type = classify_query(question)
+
+    # SPEC QUERY → RAG
+if query_type == "specs":
+        models = extract_models_from_query( question)
+        phone = get_phone_by_name(models[0]) if models else None
+        answer = format_specs(phone)
+
+    # COMPARE QUERY → Multi-Agent
+elif query_type == "compare":
+        models = extract_models_from_query(question)
+        phones = get_phone_data_for_models(models)
+        answer = generate_comparison(phones, question)
+
+   
+elif query_type == "recommend":
+        models = extract_models_from_query(question)
+        phones = get_phone_data_for_models(models)
+        answer = generate_comparison(phones, question)
+
+else:
+    answer = "Sorry, I could not understand the question."
+
+print("Answer:", answer)
 
    
 
